@@ -4,6 +4,7 @@ require_relative 'lib/ala'
 
 
 get '/' do
+  res.headers['Content-type']='text/html'
   template = File.read('views/template.erb')
   erb template, locals: {name: params[:name]}
 end
@@ -14,6 +15,12 @@ end
 
 get '/r' do  
   res.redirect '/'
+end
+
+get '/halt' do  
+  res=Rack::Response.new('halting...')
+  res.status=401
+  halt res.finish
 end
 
 post '/hey' do

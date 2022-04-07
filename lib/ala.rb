@@ -15,10 +15,12 @@ Ala=Module.new do
       routes[[m.upcase, u]] = b 
       app.map(u) do 
         run ->(e){
-            body = app.instance_eval(&resolve(e)) rescue nil            
-            res.write body
-            return res.finish if body
-            [404, {}, ['Not found']]
+            catch(:halt) do
+              body = app.instance_eval(&resolve(e)) rescue nil            
+              res.write body
+              return res.finish if body
+              [404, {}, ['Not found']]
+            end
           } 
       end 
     } 
@@ -33,6 +35,7 @@ Ala=Module.new do
   end
     
   D.(:run!){ Rack::Handler.get($handler).run( app, Port:$port ) {|server| $server=server } }
+  D.(:halt){ |res| throw :halt, res }
   
   %w[params session].map{ |method| D.( method){ req.send method} }
   %w[set enable disable configure helpers use register].map{|m|D.(m){|*_,&b|b&.[]}} 
