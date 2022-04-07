@@ -40,7 +40,7 @@ Ala=Module.new do
 
   app.use Rack::Lock 
   before do |e| 
-    req = Rack::Request.new(e); params.merge! req.params 
+    req = Rack::Request.new(e); params.transform_keys!(&:to_sym)
     resp = Rack::Response.new
   end  
   self
